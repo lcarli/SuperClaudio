@@ -14,7 +14,8 @@ using System.Collections.Generic;
 
 namespace SuperClaudio
 {
-    [BotAuthentication]
+    //[BotAuthentication]
+    [AllowAnonymous]
     public class MessagesController : ApiController
     {
         /// <summary>
@@ -26,6 +27,7 @@ namespace SuperClaudio
             if (message.Type == "Message")
             {
                 Util.listOfKeywords.Clear();
+                Random random = new Random();
                 // calculate something for us to return
                 int length = (message.Text ?? string.Empty).Length;
                 //return message.CreateReplyMessage("Olá, eu consigo ler.", "pt");
@@ -40,7 +42,7 @@ namespace SuperClaudio
                         {
                             Util.waitingAnswer = false;
                             Util.subject = "";
-                            return message.CreateReplyMessage("Ok. Você pode começar por aqui: " + r);
+                            return message.CreateReplyMessage(words[random.Next(words.Count())] + r);
                         }
                     }
                     else
@@ -54,7 +56,7 @@ namespace SuperClaudio
                 if (message.Text.ToLower().Contains("amazon") || message.Text.ToLower().Contains("aws"))
                 {
                     var result = "";
-                    foreach(KeyValuePair < string, string > entry in AWSToAzure)
+                    foreach (KeyValuePair<string, string> entry in AWSToAzure)
                     {
                         if (message.Text.ToLower().Contains(entry.Key.ToLower()))
                         {
@@ -69,7 +71,7 @@ namespace SuperClaudio
                     {
                         Util.waitingAnswer = true;
                         Util.subject = result;
-                        return message.CreateReplyMessage("Entendi. No Azure nos chamamos este serviço de: " + result + ". Posso lhe ajudar indicando uma introdução sobre o assunto?");
+                        return message.CreateReplyMessage(awsword[random.Next(awsword.Count())] + result + " " + indicacao[random.Next(indicacao.Count())]);
                     }
                 }
                 else
@@ -98,16 +100,7 @@ namespace SuperClaudio
                     //verifico se o bot entendeu
                     if (action != "nada" && entity != "nenhuma")
                     {
-                        //return message.CreateReplyMessage("Olá, eu consegui entender que você quer saber como " + action + " sobre " + entity, "pt");
                         var result = "";
-                        //foreach (var item in links)
-                        //{
-                        //    if (item.Contains(action.ToLower()) && item.Contains(entity.ToLower()))
-                        //    {
-                        //        result = item;
-                        //    }
-                        //}
-
 
                         //test using list of
                         var max = 0;
@@ -136,7 +129,7 @@ namespace SuperClaudio
                         }
                         else
                         {
-                            return message.CreateReplyMessage("Acredito que esse link possa lhe ajudar: " + result);
+                            return message.CreateReplyMessage(words[random.Next(words.Count())] + result);
                         }
 
                     }
@@ -449,6 +442,7 @@ namespace SuperClaudio
             {"initiate", "Create" },
             {"iniciar", "Create" },
             {"subir", "Create" },
+            {"subo", "Create" },
             {"deploy", "Create" },
             {"deploiar", "Create" },
             {"deployar", "Create" },
@@ -460,6 +454,8 @@ namespace SuperClaudio
             {"começar", "Create" },
             {"começo", "Create" },
             {"comeco", "Create" },
+            {"colocar", "Create" },
+            {"coloco", "Create" },
             {"crio", "Create" },
             {"levanto", "Create" },
             {"instancio", "Create" },
@@ -467,7 +463,7 @@ namespace SuperClaudio
             {"start", "Create" },
             {"aprender", "Learning Path" },
             {"curso", "Learning Path" },
-            {"estudar", "learning-paths" },
+            {"estudar", "Learning Path" },
             {"entender", "Overview" },
             {"overview", "overview"},
             {"conhecer", "overview"},
@@ -521,7 +517,7 @@ namespace SuperClaudio
             {"modelos", "example"},
             {"modelo", "example"},
             {"examples", "example"},
-            {"Automation", "Automation"},
+            {"automation", "Automation"},
             {"automação", "Automation"},
             {"automatizar", "Automation"},
             {"automaticamente", "Automation"},
@@ -552,8 +548,6 @@ namespace SuperClaudio
             {"password", "Password"},
             {"senha", "Password"},
             {"pass", "Password"},
-            {"sobre", "About"},
-            {"about", "About"},
             {"atachar", "Attach"},
             {"attachar", "Attach"},
             {"adicionar", "Attach"},
@@ -578,13 +572,15 @@ namespace SuperClaudio
             {"ps", "PowerShell" },
             {"power shell", "PowerShell" },
             {"powershell", "PowerShell" },
-            {"vm", "Virtual Machines" },
-            {"mv", "Virtual Machines" },
-            {"virtualmachine", "Virtual Machines" },
-            {"virtual machine", "Virtual Machines" },
-            {"máquina virtual", "Virtual Machines" },
-            {"maquina virtual", "Virtual Machines" },
-            {"maquinavirtual", "Virtual Machines" },
+            {"vm", "Virtual Machine" },
+            {"mv", "Virtual Machine" },
+            {"virtualmachine", "Virtual Machine" },
+            {"server", "Virtual Machine" },
+            {"servidor", "Virtual Machine" },
+            {"virtual machine", "Virtual Machine" },
+            {"máquina virtual", "Virtual Machine" },
+            {"maquina virtual", "Virtual Machine" },
+            {"maquinavirtual", "Virtual Machine" },
             {"servico de aplicativo", "AppServices" },
             {"servicode aplicativo", "AppServices" },
             {"servico deaplicativo", "AppServices" },
@@ -776,6 +772,31 @@ namespace SuperClaudio
             {"Windows", "Windows"},
             {"Linux", "Linux"},
             {"Unix", "Linux"},
+        };
+        #endregion
+
+        #region SortWordsAnswer
+        public string[] words = new string[]
+        {
+            "Excelente. Acho que isso pode lhe ajudar: ",
+            "Ok. Você pode começar por aqui: ",
+            "Que tal se eu te passar um link? Olha que legal esse(s) aqui: ",
+            "Talvez este link possa lhe ajudar... -> ",
+        };
+
+        public string[] awsword = new string[]
+        {
+            "No Azure, este serviço se chama: ",
+            "Entendi! Nós chamamos de ",
+            "Veja como é mais fácil aqui no Azure. Basta procurar por ",
+            "Simples. É só chamar de ",
+        };
+
+        public string[] indicacao = new string[]
+        {
+            "Posso lhe mostrar um link introdutório?",
+            "Entendi! Nós chamamos de ",
+            "Veja como é mais fácil aqui no Azure. Basta procurar por ",
         };
         #endregion
     }
