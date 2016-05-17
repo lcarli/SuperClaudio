@@ -135,15 +135,15 @@ namespace SuperClaudio
                     }
                     else if (entity == "nenhuma" && action != "nada")
                     {
-                        return message.CreateReplyMessage("Entendi que você quer " + action + " algo, mas não entendi exatamente o quê. Pode melhorar a pergunta?", "pt");
+                        return message.CreateReplyMessage("Entendi que você quer " + action + " algo, mas não entendi exatamente o quê. Pode melhorar a pergunta?");
                     }
                     else if (action == "nada" && entity != "nenhuma")
                     {
-                        return message.CreateReplyMessage("Vejo que você quer saber sobre " + entity + " mas não entendi muito bem o que você quer fazer. Pode reformular?", "pt");
+                        return message.CreateReplyMessage("Vejo que você quer saber sobre " + entity + " mas não entendi muito bem o que você quer fazer. Pode reformular?");
                     }
                     else
                     {
-                        return message.CreateReplyMessage("Não consegui compreender. Você pode melhorar a pergunta?", "pt");
+                        return message.CreateReplyMessage("Não consegui compreender. Você pode melhorar a pergunta?");
                     }
                 }
 
