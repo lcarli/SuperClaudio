@@ -32,6 +32,11 @@ namespace SuperClaudio
                 int length = (message.Text ?? string.Empty).Length;
                 //return message.CreateReplyMessage("Olá, eu consigo ler.", "pt");
 
+                if (message.Text.ToLower() == "hi" || message.Text.ToLower() == "oi" || message.Text.ToLower() == "olá" || message.Text.ToLower() == "ola")
+                {
+                    return message.CreateReplyMessage("Olá! Eu sou o Super Claudio. Estou aqui para lhe guiar na nuvem. Vamos começar? Também posso traduzir algum serviço da aws para o Azure, caso deseje.");
+                }
+
                 //waitingAnswer
                 if (Util.waitingAnswer)
                 {
@@ -65,7 +70,7 @@ namespace SuperClaudio
                     }
                     if (result == "")
                     {
-                        return message.CreateReplyMessage("Não entendi.");
+                        return message.CreateReplyMessage("O quê você quer saber sobre a Amazon? Algum serviço específico?");
                     }
                     else
                     {
@@ -76,6 +81,16 @@ namespace SuperClaudio
                 }
                 else
                 {
+                    foreach (KeyValuePair<string, string> entry in AWSToAzure)
+                    {
+                        if (message.Text.ToLower().Contains(entry.Key.ToLower()))
+                        {
+                            Util.waitingAnswer = true;
+                            Util.subject = entry.Value;
+                            return message.CreateReplyMessage("Este é um serviço da AWS. " + awsword[random.Next(awsword.Count())] + entry.Value + " " + indicacao[random.Next(indicacao.Count())]);
+                        }
+                    }
+
                     var entity = "nenhuma";
                     var action = "nada";
                     //verifico a entidade
@@ -782,6 +797,7 @@ namespace SuperClaudio
             "Ok. Você pode começar por aqui: ",
             "Que tal se eu te passar um link? Olha que legal esse(s) aqui: ",
             "Talvez este link possa lhe ajudar... -> ",
+            "Conhecimento sempre é bom. -> "
         };
 
         public string[] awsword = new string[]
@@ -790,13 +806,15 @@ namespace SuperClaudio
             "Entendi! Nós chamamos de ",
             "Veja como é mais fácil aqui no Azure. Basta procurar por ",
             "Simples. É só chamar de ",
+            "É mais legal no Azure. Procure por "
         };
 
         public string[] indicacao = new string[]
         {
             "Posso lhe mostrar um link introdutório?",
-            "Entendi! Nós chamamos de ",
-            "Veja como é mais fácil aqui no Azure. Basta procurar por ",
+            "Quer saber mais sobre este assunto?",
+            "Acho que um overview do assunto seria bom, não? Tem interesse?",
+            "Digite 'sim' para saber mais sobre o assunto ou 'não' para desconsiderar."
         };
         #endregion
     }
