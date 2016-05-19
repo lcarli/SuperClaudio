@@ -32,7 +32,7 @@ namespace SuperClaudio
                 int length = (message.Text ?? string.Empty).Length;
                 //return message.CreateReplyMessage("Olá, eu consigo ler.", "pt");
 
-                if (message.Text.ToLower() == "hi" || message.Text.ToLower() == "oi" || message.Text.ToLower() == "olá" || message.Text.ToLower() == "ola")
+                if (message.Text.ToLower() == "hi" || message.Text.ToLower() == "oi" || message.Text.ToLower() == "olá" || message.Text.ToLower() == "ola" || message.Text.ToLower() == "hi!" || message.Text.ToLower() == "oi!")
                 {
                     return message.CreateReplyMessage("Olá! Eu sou o Super Claudio. Estou aqui para lhe guiar na nuvem. Vamos começar? Também posso traduzir algum serviço da aws para o Azure, caso deseje.");
                 }
