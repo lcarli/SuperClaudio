@@ -158,7 +158,7 @@ namespace SuperClaudio
                     }
                     else
                     {
-                        return message.CreateReplyMessage("Não consegui compreender. Você pode melhorar a pergunta?");
+                        return message.CreateReplyMessage(incompreendido[random.Next(incompreendido.Count())]);
                     }
                 }
 
@@ -400,11 +400,34 @@ namespace SuperClaudio
             { new[] {"Windows", "Virtual Machine", "Disk", "Size", "Expand", "Image"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-expand-os-disk/" },
             { new[] {"Linux", "CLI", "Virtual Machine", "Create" }, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-cli-deploy-templates/" },
             { new[] {"Windows", "Virtual Machine", "About", "Disk"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-about-disks-vhds/" },
-            { new[] {"Windows", "Attach", "Virtual Machine", "Disk", "Portal"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-attach-disk-portal/" },
+            { new[] {"Windows", "Attach", "Virtual Machine", "Disk", "Portal", "ADD"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-attach-disk-portal/" },
+            { new[] {"Load Balance", "Windows", "ARM", "PowerShell"}, "https://azure.microsoft.com/pt-br/documentation/articles/load-balancer-get-started-internet-arm-ps/" },
+            { new[] {"Windows", "Virtual Machine", "Create", "Cluster", "HPC"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-hpcpack-cluster-options/" },
+            { new[] {"Windows", "MATLAB", "Cluster", "Create", "Virtual Machine"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-matlab-mdcs-cluster/" },
+            { new[] {"Linux", "Virtual Machine", "Create", "Portal"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-quick-create-portal/" },
+            { new[] {"Linux", "Virtual Machine", "Create", "CLI"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-quick-create-cli/" },
+            { new[] {"Install", "CLI"}, "https://azure.microsoft.com/pt-br/documentation/articles/xplat-cli-install/" },
+            { new[] {"Linux", "Virtual Machine", "ARM", "Create"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-create-ssh-secured-vm-from-template/" },
+            { new[] {"Linux", "Attach", "Virtual Machine", "Disk", "ADD"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-add-disk/" },
             { new[] {""}, "" },
             { new[] {""}, "" },
             { new[] {""}, "" },
             { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+            { new[] {""}, "" },
+
             { new[] {""}, "" },
             { new[] {""}, "" },
 
@@ -565,15 +588,21 @@ namespace SuperClaudio
             {"pass", "Password"},
             {"atachar", "Attach"},
             {"attachar", "Attach"},
-            {"adicionar", "Attach"},
-            {"add", "Attach"},
+            {"adicionar", "ADD"},
+            {"add", "ADD"},
             {"portal", "Portal"},
+            { "install", "Install" },
+            { "instalar", "Install" },
+            { "instalo", "Install" },
         };
         #endregion
 
         #region ENTITIES
         private Dictionary<string, string> EntitiesOfAzure = new Dictionary<string, string>
         {
+            {"matlab", "MATLAB" },
+            {"mat lab", "MATLAB" },
+            {"cluster", "Cluster" },
             {"script", "Script"},
             {"cli", "CLI"},
             {"command line interface", "CLI"},
@@ -765,6 +794,9 @@ namespace SuperClaudio
             {"asm", "Virtual Network"},
             {"virtual private network", "Virtual Network"},
             {"vpn", "Virtual Network"},
+            {"load balancer", "Loaad Balance" },
+            {"load balance", "Load Balancer" },
+            {"load balancing", "Load Balancer" },
             //Languages
             {"php", "PHP"},
             {"ruby", "Ruby"},
@@ -796,7 +828,7 @@ namespace SuperClaudio
             "Excelente. Acho que isso pode lhe ajudar: ",
             "Ok. Você pode começar por aqui: ",
             "Que tal se eu te passar um link? Olha que legal esse(s) aqui: ",
-            "Talvez este link possa lhe ajudar... -> ",
+            "Talvez este(s) link(s) possa lhe ajudar... -> ",
             "Conhecimento sempre é bom. -> "
         };
 
@@ -806,7 +838,8 @@ namespace SuperClaudio
             "Entendi! Nós chamamos de ",
             "Veja como é mais fácil aqui no Azure. Basta procurar por ",
             "Simples. É só chamar de ",
-            "É mais legal no Azure. Procure por "
+            "É mais legal no Azure. Procure por ",
+            "Sério? LOL! Deixe me mostrar algo mais interessante. Veja o ",
         };
 
         public string[] indicacao = new string[]
@@ -814,7 +847,17 @@ namespace SuperClaudio
             "Posso lhe mostrar um link introdutório?",
             "Quer saber mais sobre este assunto?",
             "Acho que um overview do assunto seria bom, não? Tem interesse?",
-            "Digite 'sim' para saber mais sobre o assunto ou 'não' para desconsiderar."
+            "Digite 'sim' para saber mais sobre o assunto ou 'não' para desconsiderar.",
+            "Gostaria de saber mais sobre o assunto?",
+        };
+
+        public string[] incompreendido = new string[]
+        {
+            "Não consegui entender. Você pode melhorar a pergunta?",
+            "Existem algumas coisas que ainda não consigo compreender... Pode me explicar melhor?",
+            "Que confuso! Acho que não entendi bem...",
+            "Preciso treinar mais... Pode me explicar melhor o que você quer?",
+            "Desculpe, mas não entendi.",
         };
         #endregion
     }
