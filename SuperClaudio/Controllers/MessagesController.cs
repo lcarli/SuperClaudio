@@ -32,9 +32,14 @@ namespace SuperClaudio
                 int length = (message.Text ?? string.Empty).Length;
                 //return message.CreateReplyMessage("Olá, eu consigo ler.", "pt");
 
-                if (message.Text.ToLower() == "hi" || message.Text.ToLower() == "oi" || message.Text.ToLower() == "olá" || message.Text.ToLower() == "ola" || message.Text.ToLower() == "hi!" || message.Text.ToLower() == "oi!")
+                if (ContainIntroduction(message.Text.ToLower()))
                 {
                     return message.CreateReplyMessage("Olá! Eu sou o Super Claudio. Estou aqui para lhe guiar na nuvem. Vamos começar? Também posso traduzir algum serviço da aws para o Azure, caso deseje.");
+                }
+
+                if (ContainGrettings(message.Text.ToLower()))
+                {
+                    return message.CreateReplyMessage("Ao seu dispor, sempre!");
                 }
 
                 //waitingAnswer
@@ -96,7 +101,7 @@ namespace SuperClaudio
                     //verifico a entidade
                     foreach (KeyValuePair<string, string> entry in EntitiesOfAzure)
                     {
-                        if (message.Text.ToLower().Contains(entry.Key))
+                        if (message.Text.ToLower().Contains(entry.Key.ToLower()))
                         {
                             entity = entry.Value;
                             Util.listOfKeywords.Add(entry.Value);
@@ -105,7 +110,7 @@ namespace SuperClaudio
                     //verifico a ação
                     foreach (KeyValuePair<string, string> entry in ActionsOfAzure)
                     {
-                        if (message.Text.ToLower().Contains(entry.Key))
+                        if (message.Text.ToLower().Contains(entry.Key.ToLower()))
                         {
                             action = entry.Value;
                             Util.listOfKeywords.Add(entry.Value);
@@ -118,7 +123,8 @@ namespace SuperClaudio
                         var result = "";
 
                         //test using list of
-                        var max = 0;
+                        double max = 0.00;
+                        double score = 0.00;
                         foreach (KeyValuePair<string[], string> entry in linksKeywords)
                         {
                             var counter = 0;
@@ -131,9 +137,11 @@ namespace SuperClaudio
                                         counter += 1;
                                     }
                                 }
-                                if (counter > max)
+                                var x = entry.Key.Count();
+                                score = counter / x;
+                                if (score > max)
                                 {
-                                    max = counter;
+                                    max = score;
                                     result = entry.Value;
                                 }
                             }
@@ -205,6 +213,28 @@ namespace SuperClaudio
 
             return null;
         }
+
+        #region Contains
+        private bool ContainGrettings(string message)
+        {
+            foreach (var word in grettingsList)
+            {
+                if (message.Contains(word)) return true;
+            }
+
+            return false;
+        }
+
+        private bool ContainIntroduction(string message)
+        {
+            foreach (var word in introList)
+            {
+                if (message.Contains(word)) return true;
+            }
+
+            return false;
+        }
+        #endregion
 
         #region AWS TO AZURE
         private Dictionary<string, string> AWSToAzure = new Dictionary<string, string>
@@ -408,7 +438,18 @@ namespace SuperClaudio
             { new[] {"Linux", "Virtual Machine", "Create", "CLI"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-quick-create-cli/" },
             { new[] {"Install", "CLI"}, "https://azure.microsoft.com/pt-br/documentation/articles/xplat-cli-install/" },
             { new[] {"Linux", "Virtual Machine", "ARM", "Create"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-create-ssh-secured-vm-from-template/" },
-            { new[] {"Linux", "Attach", "Virtual Machine", "Disk", "ADD"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-add-disk/" },
+            { new[] {"Linux", "Attach", "Virtual Machine", "Disk", "ADD", "CLI"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-add-disk/" },
+            { new[] {"Linux", "Virtual Machine", "Create", "Cloud Init"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-using-cloud-init/" },
+            { new[] {"Linux", "Virutal Machine", "VMAccess", "Manage", "User", "SSH"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-using-vmaccess-extension/" },
+            { new[] {"Linux", "Virtual Machine", "Create", "CLI"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-create-cli-complete/" },
+            { new[] {"Linux", "Attach", "Virtual Machine", "Disk", "ADD", "Portal"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-attach-disk-portal/" },
+            { new[] {"Linux", "Virtual Machine", "Create", "CLI", "Tamanho", "Scale"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-cli-vmss-create/" },
+            { new[] {"Linux", "Virtual Machine", "Docker", "Create"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-docker-machine/" },
+            { new[] {"Linux", "Virtual Machine", "Overview", "About"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-azure-overview/" },
+            { new[] {"Linux", "Virtual Machine", "Root"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-use-root-privileges/" },
+            { new[] {"Linux", "Virtual Machine", "Size"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-sizes/" },
+            { new[] {"Linux", "Virtual Machine", "Monitoring"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-vm-monitoring/" },
+            { new[] {"Pricing"}, "https://azure.microsoft.com/en-us/pricing/calculator/" },
             { new[] {""}, "" },
             { new[] {""}, "" },
             { new[] {""}, "" },
@@ -416,18 +457,6 @@ namespace SuperClaudio
             { new[] {""}, "" },
             { new[] {""}, "" },
             { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-            { new[] {""}, "" },
-
             { new[] {""}, "" },
             { new[] {""}, "" },
 
@@ -517,6 +546,7 @@ namespace SuperClaudio
             {"escala", "Scale"},
             {"scale", "Scale"},
             {"scaleset", "Scale"},
+            {"scale set", "Scale"},
             {"conjunto de disponibilidade", "Scale"},
             {"escalonamento", "Scale"},
             {"tamanho", "size" },
@@ -594,12 +624,30 @@ namespace SuperClaudio
             { "install", "Install" },
             { "instalar", "Install" },
             { "instalo", "Install" },
+            {"usuario", "User"},
+            {"usuário", "User"},
+            {"user", "User"},
+            {"users", "User"},
+            {"usuarios", "User"},
+            {"usuários", "User"},
+            {"root", "Root" },
+            {"monitoramento", "Monitoring"},
+            {"monitorar", "Monitoring"},
+            {"monitoro", "Monitoring"},
+            {"monitoring", "Monitoring"},
         };
         #endregion
 
         #region ENTITIES
         private Dictionary<string, string> EntitiesOfAzure = new Dictionary<string, string>
         {
+            {"preço", "Pricing"},
+            {"preco", "Pricing"},
+            {"price", "Pricing"},
+            {"Pricing", "Pricing"},
+            {"vmaccess", "VMAccess" },
+            {"ssh", "SSH" },
+            {"cloud init", "Cloud Init" },
             {"matlab", "MATLAB" },
             {"mat lab", "MATLAB" },
             {"cluster", "Cluster" },
@@ -617,14 +665,22 @@ namespace SuperClaudio
             {"power shell", "PowerShell" },
             {"powershell", "PowerShell" },
             {"vm", "Virtual Machine" },
+            {"vms", "Virtual Machine" },
             {"mv", "Virtual Machine" },
             {"virtualmachine", "Virtual Machine" },
+            {"virtualmachines", "Virtual Machine" },
             {"server", "Virtual Machine" },
             {"servidor", "Virtual Machine" },
+            {"servers", "Virtual Machine" },
+            {"servidores", "Virtual Machine" },
             {"virtual machine", "Virtual Machine" },
             {"máquina virtual", "Virtual Machine" },
             {"maquina virtual", "Virtual Machine" },
             {"maquinavirtual", "Virtual Machine" },
+            {"virtual machines", "Virtual Machine" },
+            {"máquinas virtuais", "Virtual Machine" },
+            {"maquinas virtuais", "Virtual Machine" },
+            {"maquinasvirtuais", "Virtual Machine" },
             {"servico de aplicativo", "AppServices" },
             {"servicode aplicativo", "AppServices" },
             {"servico deaplicativo", "AppServices" },
@@ -788,7 +844,6 @@ namespace SuperClaudio
             {"internet ofthings", "IoT Hub" },
             {"internetofthings", "IoT Hub" },
             {"container", "Container"},
-            {"docker", "Container"},
             {"contâiner", "Container"},
             {"virtual network", "Virtual Network"},
             {"asm", "Virtual Network"},
@@ -797,6 +852,7 @@ namespace SuperClaudio
             {"load balancer", "Loaad Balance" },
             {"load balance", "Load Balancer" },
             {"load balancing", "Load Balancer" },
+            {"docker", "Docker" },
             //Languages
             {"php", "PHP"},
             {"ruby", "Ruby"},
@@ -858,6 +914,67 @@ namespace SuperClaudio
             "Que confuso! Acho que não entendi bem...",
             "Preciso treinar mais... Pode me explicar melhor o que você quer?",
             "Desculpe, mas não entendi.",
+        };
+        #endregion
+
+        #region WordLists
+        public List<string> grettingsList = new List<string>
+        {
+            "Obrigado",
+            "Obrigado!",
+            "Obrigada",
+            "Obrigada!",
+            "brigado",
+            "brigada",
+            "brigado!",
+            "brigada!",
+            "valeu",
+            "valeu!",
+            "vlw",
+            "tks",
+            "thankyou",
+            "tks!",
+            "thanks",
+            "thanks!",
+            "thank you",
+            "thankyou!",
+            "thank you!",
+            "tchau!",
+            "tchau",
+            "bye!",
+            "bye",
+            "adeus!",
+            "adeus",
+            "ate a proxima",
+            "até a proxima",
+            "ate a próxima",
+            "até a próxima",
+            "ate a proxima!",
+            "até a proxima!",
+            "ate a próxima!",
+            "até a próxima!",
+            "ate a proxima",
+        };
+
+        public List<string> introList = new List<string>
+        {
+            "oi",
+            "oi!",
+            "olá",
+            "olá!",
+            "ola",
+            "ola!",
+            "hi!",
+            "hi",
+            "hey",
+            "hey!",
+            "e aí?",
+            "e aí",
+            "e ai",
+            "e ai?",
+            "blz",
+            "blz?",
+            "beleza?",
         };
         #endregion
     }
