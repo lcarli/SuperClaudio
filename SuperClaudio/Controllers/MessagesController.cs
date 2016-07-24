@@ -50,17 +50,15 @@ namespace SuperClaudio
                         var r = "";
                         if (overview.TryGetValue(Util.subject, out r))
                         {
-                            Util.waitingAnswer = false;
-                            Util.subject = "";
                             return message.CreateReplyMessage(words[random.Next(words.Count())] + r);
                         }
                     }
-                    else
+                    else if (message.Text.ToLower() == "nao" || message.Text.ToLower() == "não" || message.Text.ToLower() == "no" || message.Text.ToLower() == "nope")
                     {
-                        Util.waitingAnswer = false;
-                        Util.subject = "";
                         return message.CreateReplyMessage("Ok.");
                     }
+                    Util.waitingAnswer = false;
+                    Util.subject = "";
                 }
 
                 if (message.Text.ToLower().Contains("amazon") || message.Text.ToLower().Contains("aws"))
@@ -92,7 +90,7 @@ namespace SuperClaudio
                         {
                             Util.waitingAnswer = true;
                             Util.subject = entry.Value;
-                            return message.CreateReplyMessage("Este é um serviço da AWS. " + awsword[random.Next(awsword.Count())] + entry.Value + " " + indicacao[random.Next(indicacao.Count())]);
+                            return message.CreateReplyMessage("Este é um serviço da AWS. " + awsword[random.Next(awsword.Count())] + entry.Value + ". " + indicacao[random.Next(indicacao.Count())]);
                         }
                     }
 
@@ -138,7 +136,7 @@ namespace SuperClaudio
                                     }
                                 }
                                 var x = entry.Key.Count();
-                                score = counter / x;
+                                score = (double)counter / (double)x;
                                 if (score > max)
                                 {
                                     max = score;
@@ -309,7 +307,7 @@ namespace SuperClaudio
             {"Mobile Analytics","Mobile Engagement"},
             {"Amazon API Gateway","API Apps | API Management"},
             {"API Gateway","API Apps | API Management"},
-            {"IoT","IoT Suite"},
+            {"Amazon IoT","IoT Suite"},
             {"AWS Quick Start","Template"},
             {"Quick Start","Template"},
             {"AWS Marketplace","Azure Marketplace"},
@@ -450,6 +448,14 @@ namespace SuperClaudio
             { new[] {"Linux", "Virtual Machine", "Size"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-sizes/" },
             { new[] {"Linux", "Virtual Machine", "Monitoring"}, "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-linux-vm-monitoring/" },
             { new[] {"Pricing"}, "https://azure.microsoft.com/en-us/pricing/calculator/" },
+            { new[] {"Scenarios", "WebApp"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/web-app/" },
+            { new[] {"Scenarios", "MobileApp"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/mobile-app/" },
+            { new[] {"Scenarios", "Virtual Machine"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/virtual-machines/" },
+            { new[] {"Scenarios", "Analytics"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/data-analytics/" },
+            { new[] {"Scenarios", "Big Data"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/high-performance-computing/" },
+            { new[] {"Scenarios", "IoT", "IoT Hub"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/internet-of-things/" },
+            { new[] {"Scenarios", "DevTest"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/devtest/" },
+            { new[] {"Scenarios", "Backup"}, "https://azure.microsoft.com/pt-br/documentation/scenarios/storage-backup-recovery/" },
             { new[] {""}, "" },
             { new[] {""}, "" },
             { new[] {""}, "" },
@@ -458,52 +464,63 @@ namespace SuperClaudio
             { new[] {""}, "" },
             { new[] {""}, "" },
             { new[] {""}, "" },
-            { new[] {""}, "" },
+            { new[] {""}, "" },            
+
 
             { new[] {""}, "" },
         };
         #endregion
 
         #region ACTIONS LIST
-        private Dictionary<string, string[]> ActionsListOfAzure = new Dictionary<string, string[]>
-        {
-            {"create", new[] { "Create"} },
-            {"criar", new[] { "Create" } },
-            {"initiate", new[] { "Create" } },
-            {"iniciar", new[] { "Create" } },
-            {"deploy", new[] { "Create", "Deploy" } },
-            {"deploiar", new[] { "Create" } },
-            {"deployar", new[] { "Create" } },
-            {"instanciar", new[] { "Create" } },
-            {"new", new[] { "Create" } },
-            {"nova", new[] { "Create" } },
-            {"levantar", new[] { "Create" } },
-            {"comecar", new[] { "Create" } },
-            {"começar", new[] { "Create" } },
-            {"começo", new[] { "Create" } },
-            {"comeco", new[] { "Create" } },
-            {"crio", new[] { "Create" } },
-            {"levanto", new[] { "Create" } },
-            {"instancio", new[] { "Create" } },
-            {"inicio", new[] { "Create" } },
-            {"start", new[] { "Create" } },
-            {"aprender", new[] { "Learning Path" } },
-            {"curso", new[] { "Learning Path" } },
-            {"estudar", new[] { "Learning Path" } },
-            {"entender", new[] { "Overview", "sobre" } },
-            {"overview", new[] { "overview", "sobre" } },
-            {"conhecer", new[] { "overview", "sobre" } },
-            {"sobre", new[] { "overview", "sobre" } },
-            {"about", new[] { "overview", "sobre" } },
-            {"como funciona", new[] { "overview", "Sobre" } },
-            {"how works", new[] { "overview", "sobre"} },
-            {"how it works", new[] { "overview", "sobre"} },
-        };
+        //private Dictionary<string, string[]> ActionsListOfAzure = new Dictionary<string, string[]>
+        //{
+        //    {"create", new[] { "Create"} },
+        //    {"criar", new[] { "Create" } },
+        //    {"initiate", new[] { "Create" } },
+        //    {"iniciar", new[] { "Create" } },
+        //    {"deploy", new[] { "Create", "Deploy" } },
+        //    {"deploiar", new[] { "Create" } },
+        //    {"deployar", new[] { "Create" } },
+        //    {"instanciar", new[] { "Create" } },
+        //    {"new", new[] { "Create" } },
+        //    {"nova", new[] { "Create" } },
+        //    {"levantar", new[] { "Create" } },
+        //    {"comecar", new[] { "Create" } },
+        //    {"começar", new[] { "Create" } },
+        //    {"começo", new[] { "Create" } },
+        //    {"comeco", new[] { "Create" } },
+        //    {"crio", new[] { "Create" } },
+        //    {"levanto", new[] { "Create" } },
+        //    {"instancio", new[] { "Create" } },
+        //    {"inicio", new[] { "Create" } },
+        //    {"start", new[] { "Create" } },
+        //    {"aprender", new[] { "Learning Path" } },
+        //    {"curso", new[] { "Learning Path" } },
+        //    {"estudar", new[] { "Learning Path" } },
+        //    {"entender", new[] { "Overview", "sobre" } },
+        //    {"overview", new[] { "overview", "sobre" } },
+        //    {"conhecer", new[] { "overview", "sobre" } },
+        //    {"sobre", new[] { "overview", "sobre" } },
+        //    {"about", new[] { "overview", "sobre" } },
+        //    {"como funciona", new[] { "overview", "Sobre" } },
+        //    {"how works", new[] { "overview", "sobre"} },
+        //    {"how it works", new[] { "overview", "sobre"} },
+        //};
         #endregion
 
         #region ACTIONS
         private Dictionary<string, string> ActionsOfAzure = new Dictionary<string, string>
         {
+            {"scenarios", "Scenarios" },
+            {"cenarios", "Scenarios" },
+            {"cenários", "Scenarios" },
+            {"scenario", "Scenarios" },
+            {"cenario", "Scenarios" },
+            {"cenário", "Scenarios" },
+            {"preço", "Pricing"},
+            {"preco", "Pricing"},
+            {"price", "Pricing"},
+            {"Pricing", "Pricing"},
             {"create", "Create"},
             {"criar", "Create" },
             {"initiate", "Create" },
@@ -635,6 +652,7 @@ namespace SuperClaudio
             {"monitorar", "Monitoring"},
             {"monitoro", "Monitoring"},
             {"monitoring", "Monitoring"},
+            {"ativar", "Start" },
         };
         #endregion
 
@@ -843,6 +861,7 @@ namespace SuperClaudio
             {"internetof things", "IoT Hub" },
             {"internet ofthings", "IoT Hub" },
             {"internetofthings", "IoT Hub" },
+            {"IoT", "IoT" },
             {"container", "Container"},
             {"contâiner", "Container"},
             {"virtual network", "Virtual Network"},
@@ -866,7 +885,7 @@ namespace SuperClaudio
             {"node.js", "JS"},
             {"JavaScript", "JS"},
             {"java script", "JS"},
-            {"C", "C"},
+            //{"C", "C"},
             {"C++", "C++"},
             {"C ++", "C++"},
             {".net", "C#"},
