@@ -40,6 +40,10 @@ namespace superbotcloudV3
                 {
                     reply = activity.CreateReply(Random("goodbyesanswers"));
                 }
+                else if (Contain("AWSlist", activity.Text))
+                {
+                    reply = activity.CreateReply(Random("AWSconvertion"));
+                }
                 else
                 {
                     reply = activity.CreateReply(Random("missunderstood"));
