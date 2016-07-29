@@ -16,7 +16,11 @@ namespace superbotcloudV3
     [BotAuthentication]
     public class MessagesController : ApiController
     {
+        #region Global Variables
         Random random = new Random();
+        #endregion
+
+
         /// <summary>
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
@@ -59,6 +63,7 @@ namespace superbotcloudV3
             return response;
         }
 
+        #region HandleSystemMessage
         private Activity HandleSystemMessage(Activity message)
         {
             if (message.Type == ActivityTypes.DeleteUserData)
@@ -87,7 +92,15 @@ namespace superbotcloudV3
 
             return null;
         }
+        #endregion
 
+        #region Methods Contain and Random
+        /// <summary>
+        ///     Used to verify each word inside the message sent from user with specific dictionaries 
+        /// </summary>
+        /// <param name="filename"></param>  -> contain the name of the file .JSON with dictionary
+        /// <param name="msg"></param>  -> the message sent from user to verify with the dictionary
+        /// <returns></returns>
         private bool Contain(string filename, string msg)
         {
             string path = "~/Docs/" + filename + ".json";
@@ -101,6 +114,11 @@ namespace superbotcloudV3
             return false;
         }
 
+        /// <summary>
+        ///     Used to get a dictionary with sorted response and sort one of them
+        /// </summary>
+        /// <param name="filename"></param>  -> contain the name of the file .JSON with dictionary
+        /// <returns></returns>
         private string Random(string filename)
         {
             string path = "~/Docs/" + filename + ".json";
@@ -114,5 +132,53 @@ namespace superbotcloudV3
             }
             return x[random.Next(x.Count())];
         }
+        #endregion
+
+        #region Custom Replies (Carousel)
+        private Activity createReplyWithCarousel(Activity message)
+        {
+            Activity replyToConversation = message.CreateReply(Random("standard"));
+            replyToConversation.Recipient = message.From;
+            replyToConversation.Type = "message";
+            replyToConversation.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            replyToConversation.Attachments = new List<Attachment>();
+
+            Dictionary<string, string> cardContentList = new Dictionary<string, string>();
+            cardContentList.Add("PigLatin", "https://<ImageUrl1>");
+            cardContentList.Add("Pork Shoulder", "https://<ImageUrl2>");
+            cardContentList.Add("Bacon", "https://<ImageUrl3>");
+
+            foreach (KeyValuePair<string, string> cardContent in cardContentList)
+            {
+                List<CardImage> cardImages = new List<CardImage>();
+                cardImages.Add(new CardImage(url: cardContent.Value));
+
+                List<CardAction> cardButtons = new List<CardAction>();
+
+                CardAction plButton = new CardAction()
+                {
+                    Value = $"https://en.wikipedia.org/wiki/{cardContent.Key}",
+                    Type = "openUrl",
+                    Title = "WikiPedia Page"
+                };
+                cardButtons.Add(plButton);
+
+                HeroCard plCard = new HeroCard()
+                {
+                    Title = $"I'm a hero card about {cardContent.Key}",
+                    Subtitle = $"{cardContent.Key} Wikipedia Page",
+                    Images = cardImages,
+                    Buttons = cardButtons
+                };
+
+                Attachment plAttachment = plCard.ToAttachment();
+                replyToConversation.Attachments.Add(plAttachment);
+            }
+
+            replyToConversation.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+            return replyToConversation;
+        }
+        #endregion
     }
 }
