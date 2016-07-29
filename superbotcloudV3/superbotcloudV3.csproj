@@ -127,6 +127,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Docs\AWSconvertion.json" />
+    <Content Include="Docs\AWSrecomendations.json" />
+    <Content Include="Docs\badwords.json" />
+    <Content Include="Docs\badwordsanswers.json" />
+    <Content Include="Docs\goodbyes.json" />
+    <Content Include="Docs\goodbyesanswers.json" />
+    <Content Include="Docs\greetings.json" />
+    <Content Include="Docs\missunderstood.json" />
+    <Content Include="Docs\specialanswers.json" />
+    <Content Include="Docs\specialquestions.json" />
+    <Content Include="Docs\standard.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
