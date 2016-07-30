@@ -14,7 +14,7 @@ using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.Azure;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace superbotcloudV3
 {
@@ -80,8 +80,18 @@ namespace superbotcloudV3
                 }
                 else
                 {
-                    reply = activity.CreateReply(Random("missunderstood"));
+                    string[] words = activity.Text.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
+                    string entities = "";
+                    foreach (string word in words)
+                    {
+                        entities = entities + "|";
+                    }
+                    await connector.Conversations.ReplyToActivityAsync(reply = activity.CreateReply(GetLinks(entities).First()));
                 }
+                //else
+                //{
+                //    reply = activity.CreateReply(Random("missunderstood"));
+                //}
 
                 if (interactive)
                 {
@@ -294,35 +304,38 @@ namespace superbotcloudV3
         #endregion
 
         #region Methods
-        public async void SendDataTelemetryToTableStorage(string name, string channel)
+        public void SendDataTelemetryToTableStorage(string name, string channel)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-            // Retrieve a reference to the table.
-            CloudTable table = tableClient.GetTableReference("Telemetry");
-            // Create the table if it doesn't exist.
-            table.CreateIfNotExists();
-            TelemetryEntity tel = new TelemetryEntity(name);
+
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            // Retrieve a reference to a container.
+            CloudBlobContainer container = blobClient.GetContainerReference("telemetrycontainer");
+
+            // Create the container if it doesn't already exist.
+            container.CreateIfNotExists();
+
+            string n = Guid.NewGuid().ToString();
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(n);
+
+            TelemetryEntity tel = new TelemetryEntity();
             tel.UserName = name;
             tel.UserChannel = channel;
-            // Create the TableOperation object that inserts the customer entity.
-            TableOperation insertOperation = TableOperation.InsertOrMerge(tel);
-            // Execute the insert operation.
-            TableResult x = await table.ExecuteAsync(insertOperation);
+
+            blockBlob.UploadText(JsonConvert.SerializeObject(tel));
         }
         #endregion
 
         #region Entity to Table Storage
-        public class TelemetryEntity : TableEntity
+        public class TelemetryEntity : Entity
         {
-            public TelemetryEntity(string user)
-            {
-                this.PartitionKey = user;
-                this.RowKey = Guid.NewGuid().ToString();
-            }
+            public TelemetryEntity() {}
 
             public string UserName { get; set; }
+
+            public string id { get; set; }
 
             public string UserChannel { get; set; }
         }
