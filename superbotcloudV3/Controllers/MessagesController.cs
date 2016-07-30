@@ -37,6 +37,9 @@ namespace superbotcloudV3
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 Activity reply;
 
+                var properties = new Dictionary<string, string> {{"UserChannel", activity.ChannelId.ToString()}, {"UserName", activity.From.Name}};
+                telemetry.TrackEvent("Message requested", properties);
+
                 //test
                 //if (activity.Text == "links") 
                 //{
@@ -128,6 +131,7 @@ namespace superbotcloudV3
         #region /APIS
         private string[] GetLinks(string keywords)
         {
+            telemetry.TrackEvent("GetLinks");
             HttpClient client = new HttpClient();
             HttpResponseMessage response = client.GetAsync("http://dxswarmagents.eastus.cloudapp.azure.com/api/links/" + keywords).Result;
             string[] data = JsonConvert.DeserializeObject<string[]>(response.Content.ReadAsStringAsync().Result);
@@ -151,7 +155,7 @@ namespace superbotcloudV3
             dynamic array = JsonConvert.DeserializeObject(json);
             foreach (string word in array.data)
             {
-                if (msg.ToLower().Contains(word.ToLower())) return true;
+                if (msg.ToLower().Contains(word.ToLower())) telemetry.TrackEvent("Contain: " + filename); return true;
             }
             return false;
         }
@@ -165,6 +169,8 @@ namespace superbotcloudV3
         {
             string path = "~/Docs/" + filename + ".json";
             var json = File.ReadAllText(HttpContext.Current.Server.MapPath(path));
+
+            telemetry.TrackEvent("Random: " + filename);
 
             dynamic array = JsonConvert.DeserializeObject(json);
             List<string> x = new List<string>();
@@ -188,6 +194,7 @@ namespace superbotcloudV3
                 var x = msg.ToLower();
                 if (msg.ToLower().Contains(word.Name.ToLower()))
                 {
+                    telemetry.TrackEvent("AWS searched: " + word.Name + ". And Azure found: " + word.First.Value);
                     AWSEntity = word.First.Value;
                     result = "OK";
                 }
