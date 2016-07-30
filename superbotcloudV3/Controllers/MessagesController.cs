@@ -145,7 +145,7 @@ namespace superbotcloudV3
                     string entities = "";
                     foreach (string word in words)
                     {
-                        entities = word + "|";
+                        entities = entities + "|" + word;
                     }
                     try
                     {
