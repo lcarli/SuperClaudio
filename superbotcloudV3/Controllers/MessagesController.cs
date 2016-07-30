@@ -53,17 +53,24 @@ namespace superbotcloudV3
                 {
                     reply = activity.CreateReply(Random("badwordsanswers"));
                 }
-                else if (activity.Text == "yesaws")
+                else if (activity.Text.ToLower().Contains("yesaws"))
                 {
-                    AWSEntity = "";
-                    reply = activity.CreateReply("Ok. Vou enviar!");
-                    //send link AWS
+                    var r = "";
+                    AWSEntity = activity.Text.Replace("yesaws ", "");
+                    if (overview.TryGetValue(AWSEntity, out r))
+                    {
+                        reply = activity.CreateReply(Random("standard") + r);
+                    }
+                    else
+                    {
+                        AWSEntity = "";
+                        reply = activity.CreateReply(Random("missunderstood"));
+                    }
                 }
                 else if (activity.Text == "noaws")
                 {
                     AWSEntity = "";
                     reply = activity.CreateReply("Ok. NÃO Vou enviar!");
-                    //send link AWS
                 }
                 else if (Contain("greetings", activity.Text))
                 {
@@ -73,7 +80,7 @@ namespace superbotcloudV3
                 {
                     reply = activity.CreateReply(Random("goodbyesanswers"));
                 }
-                else if (activity.Text == "Bot, qual a sua arquitetura?")
+                else if (activity.Text.ToLower().Contains("arquitetura") && activity.Text.ToLower().Contains("bot"))
                 {
                     string link = "https://peulfg.by3302.livefilestore.com/y3pYLFDIG22tRzAYUNS--dM4ZIWBpNIYu8vfeeSQ3Fhzl_OjlE7OsrRzX2_J_MSE7R6iRlzjMKOgV2IYyfE6mLkcHaEIfjZO1jwK4PfAh75m7SccSTqlqswQ_ZgGWmox2NWr29XqXkMZwFV9QwRjKn3wL0tJZTGc4HBtgyRuSeZA1c/infra.PNG?psid=1";
                     reply  = activity.CreateReply("Esta é a minha arquitetura");
@@ -100,7 +107,7 @@ namespace superbotcloudV3
                     reply.Attachments.Add(plAttachment);
                     interactive = true;
                 }
-                else if (activity.Text == "Bot, como você nasceu?")
+                else if (activity.Text.ToLower().Contains("bot") && activity.Text.ToLower().Contains("nasceu"))
                 {
                     string link = "https://peulfg.by3302.livefilestore.com/y3p1D5hjNqlIPq_Wm5Z7soOICsfXeER2iA1yDEpUwCb19QFkOnMhzyVl0ifJmh6ijPJLjRzIeGkzolQR22P_kgGusWpx3FC7mSdjWrK1kAyOJM61uljRot-sBW9I-V8BESUrvZK3ra2mPGWOcrS6HPXJylsJwDCAfCW2AYxri_f9_g/flow.PNG?psid=1";
                     reply = activity.CreateReply("Esse assunto é o mais interessante! Este aqui é meu fluxo DevOps.");
@@ -140,7 +147,16 @@ namespace superbotcloudV3
                     {
                         entities = word + "|";
                     }
-                    await connector.Conversations.ReplyToActivityAsync(reply = activity.CreateReply(Random("standard") + GetLinks(entities).First()));
+                    try
+                    {
+                        var result = GetLinks(entities).First();
+                        reply = activity.CreateReply(Random("standard") + result);
+                    }
+                    catch (Exception)
+                    {
+                        reply = activity.CreateReply(Random("missunderstood"));
+                    }
+                    
                 }
                 //else
                 //{
@@ -331,7 +347,7 @@ namespace superbotcloudV3
 
             CardAction plButtonYES = new CardAction()
             {
-                Value = "yesaws",
+                Value = "yesaws " + AWSEntity,
                 Type = "postBack",
                 Title = "SIM"
             };
@@ -393,6 +409,64 @@ namespace superbotcloudV3
 
             public string UserChannel { get; set; }
         }
+        #endregion
+
+        #region LINKS OVERVIEW
+        private Dictionary<string, string> overview = new Dictionary<string, string>
+        {
+            {"Virtual Machines", "https://azure.microsoft.com/pt-br/documentation/services/virtual-machines/"},
+            {"Docker Virtual Machine Extension", "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-windows-dockerextension/"},
+            {"Container Service", "https://azure.microsoft.com/pt-br/documentation/articles/container-service-intro/"},
+            {"Azure Web Apps", "https://azure.microsoft.com/pt-br/documentation/articles/app-service-web-overview/"},
+            {"Azure Autoscale", "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machine-scale-sets-overview/ e https://azure.microsoft.com/pt-br/documentation/articles/web-sites-scale/"},
+            {"WebJobs OU Logic Apps OU Azure Funcions", "https://azure.microsoft.com/pt-br/documentation/articles/websites-webjobs-resources/ e https://azure.microsoft.com/pt-br/services/app-service/logic/ e https://azure.microsoft.com/pt-br/documentation/articles/functions-overview/"},
+            {"Azure Blob Storage (Block Blob)", "https://azure.microsoft.com/pt-br/documentation/articles/storage-introduction/"},
+            {"Azure Blob Storage (Page Blob)", "https://azure.microsoft.com/pt-br/documentation/articles/virtual-machines-disks-vhds/ e https://azure.microsoft.com/pt-br/services/storage/premium-storage/"},
+            {"Azure Import/Export", "https://azure.microsoft.com/pt-br/documentation/articles/storage-import-export-service/"},
+            {"Azure SQL Database", "https://azure.microsoft.com/pt-br/services/sql-database/"},
+            {"Azure DocumentDB", "https://azure.microsoft.com/pt-br/services/documentdb/"},
+            {"Azure Managed Cache (Redis Cache)", "https://azure.microsoft.com/pt-br/services/cache/"},
+            {"Azure SQL Data Warehouse", "https://azure.microsoft.com/pt-br/services/sql-data-warehouse/"},
+            {"Azure Virtual Network", "https://azure.microsoft.com/pt-br/documentation/services/virtual-network/"},
+            {"Azure DNS", "https://azure.microsoft.com/pt-br/services/dns/ e https://azure.microsoft.com/pt-br/services/traffic-manager/"},
+            {"Azure Load Balancer/Traffic Manager", "https://azure.microsoft.com/pt-br/services/load-balancer/ e https://azure.microsoft.com/pt-br/services/application-gateway/"},
+            {"VPN Gateway", "https://azure.microsoft.com/pt-br/services/virtual-network/"},
+            {"HDInsight", "https://azure.microsoft.com/pt-br/services/hdinsight/"},
+            {"Machine Learning","https://azure.microsoft.com/pt-br/services/machine-learning/"},
+            {"Azure Search", "https://azure.microsoft.com/pt-br/services/search/"},
+            {"Stream Analytics", "https://azure.microsoft.com/pt-br/services/stream-analytics/"},
+            {"Azure CLI, Azure SDKs, PowerShell, 3rd Party Shell Scripting", "https://azure.microsoft.com/pt-br/documentation/articles/powershell-install-configure/ e https://azure.microsoft.com/pt-br/documentation/articles/xplat-cli-install/"},
+            {"VSO", "https://www.visualstudio.com/get-started/overview-of-get-started-tasks-vs"},
+            {"Visual Studio Application Insights", "https://azure.microsoft.com/pt-br/services/application-insights/"},
+            {"Resource Manager", "https://azure.microsoft.com/pt-br/features/resource-manager/"},
+            {"Operational Insights", "https://azure.microsoft.com/pt-br/services/application-insights/ e https://azure.microsoft.com/pt-br/services/operational-insights/"},
+            {"Automation", "https://azure.microsoft.com/pt-br/services/automation/"},
+            {"Active Directory", "https://azure.microsoft.com/pt-br/documentation/articles/role-based-access-control-configure/"},
+            {"Multi-Factor Authentication", "https://azure.microsoft.com/pt-br/services/multi-factor-authentication/"},
+            {"Key Vault", "https://azure.microsoft.com/pt-br/services/key-vault/"},
+            {"Media Services", "https://azure.microsoft.com/pt-br/services/media-services/encoding/"},
+            {"Content Delivery Network", "https://azure.microsoft.com/pt-br/services/cdn/"},
+            {"Mobile App", "https://azure.microsoft.com/pt-br/services/app-service/mobile/"},
+            {"Notification Hubs", "https://azure.microsoft.com/pt-br/services/notification-hubs/"},
+            {"Mobile Engagement", "https://azure.microsoft.com/pt-br/services/mobile-engagement/"},
+            {"API Apps | API Management", "https://azure.microsoft.com/pt-br/services/api-management/"},
+            {"IoT Suite", "https://azure.microsoft.com/pt-br/services/iot-hub/ e https://azure.microsoft.com/en-us/solutions/iot-suite/"},
+            {"Templates", "https://azure.microsoft.com/pt-br/documentation/templates/"},
+            {"Azure Marketplace", "https://azure.microsoft.com/pt-br/marketplace/"},
+            {"Blob Storage", "https://azure.microsoft.com/pt-br/services/storage/blobs/"},
+            {"File Storage", "https://azure.microsoft.com/pt-br/services/storage/files/"},
+            {"StorSimple" , "https://azure.microsoft.com/pt-br/services/storsimple/"},
+            {"Express Route", "https://azure.microsoft.com/pt-br/services/expressroute/"},
+            {"SQL Database Migration","https://azure.microsoft.com/pt-br/documentation/articles/sql-database-cloud-migrate/ e https://azure.microsoft.com/pt-br/documentation/articles/sql-database-cloud-migrate/"},
+            {"Data Factory", "https://azure.microsoft.com/pt-br/services/data-factory/"},
+            {"Power BI", "https://powerbi.microsoft.com/"},
+            {"Security Center", "https://azure.microsoft.com/pt-br/services/security-center/"},
+            {"Azure AD", "https://azure.microsoft.com/pt-br/services/active-directory/ e https://azure.microsoft.com/pt-br/services/active-directory-ds/"},
+            {"Queue Storage", "https://azure.microsoft.com/pt-br/services/storage/queues/"},
+            {"Logic Apps", "https://azure.microsoft.com/pt-br/services/app-service/logic/"},
+            {"Remote App", "https://azure.microsoft.com/pt-br/services/remoteapp/"},
+            {"Dev-Test Lab", "https://azure.microsoft.com/pt-br/services/devtest-lab/"},
+        };
         #endregion
     }
 }
