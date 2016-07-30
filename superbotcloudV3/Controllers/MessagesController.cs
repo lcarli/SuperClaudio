@@ -12,6 +12,9 @@ using System.Web;
 using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.Azure;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace superbotcloudV3
 {
@@ -37,8 +40,8 @@ namespace superbotcloudV3
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 Activity reply;
 
-                var properties = new Dictionary<string, string> {{"UserChannel", activity.ChannelId.ToString()}, {"UserName", activity.From.Name}};
-                telemetry.TrackEvent("Message requested", properties);
+                //sending data to Telemetry
+                SendDataTelemetryToTableStorage(activity.From.Name, activity.ChannelId.ToString());
 
                 //test
                 //if (activity.Text == "links") 
@@ -155,7 +158,11 @@ namespace superbotcloudV3
             dynamic array = JsonConvert.DeserializeObject(json);
             foreach (string word in array.data)
             {
-                if (msg.ToLower().Contains(word.ToLower())) telemetry.TrackEvent("Contain: " + filename); return true;
+                if (msg.ToLower().Contains(word.ToLower()))
+                {
+                    telemetry.TrackEvent("Contain: " + filename);
+                    return true;
+                }
             }
             return false;
         }
@@ -283,6 +290,41 @@ namespace superbotcloudV3
             replyToConversation.Attachments.Add(plAttachment);
 
             return replyToConversation;
+        }
+        #endregion
+
+        #region Methods
+        public async void SendDataTelemetryToTableStorage(string name, string channel)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            // Retrieve a reference to the table.
+            CloudTable table = tableClient.GetTableReference("Telemetry");
+            // Create the table if it doesn't exist.
+            table.CreateIfNotExists();
+            TelemetryEntity tel = new TelemetryEntity(name);
+            tel.UserName = name;
+            tel.UserChannel = channel;
+            // Create the TableOperation object that inserts the customer entity.
+            TableOperation insertOperation = TableOperation.InsertOrMerge(tel);
+            // Execute the insert operation.
+            TableResult x = await table.ExecuteAsync(insertOperation);
+        }
+        #endregion
+
+        #region Entity to Table Storage
+        public class TelemetryEntity : TableEntity
+        {
+            public TelemetryEntity(string user)
+            {
+                this.PartitionKey = user;
+                this.RowKey = Guid.NewGuid().ToString();
+            }
+
+            public string UserName { get; set; }
+
+            public string UserChannel { get; set; }
         }
         #endregion
     }
