@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Web;
 using System.Collections.Generic;
+using Microsoft.ApplicationInsights;
+using System.Diagnostics;
 
 namespace superbotcloudV3
 {
@@ -18,6 +20,9 @@ namespace superbotcloudV3
     {
         #region Global Variables
         Random random = new Random();
+        TelemetryClient telemetry = new TelemetryClient();
+        bool interactive = false;
+        string AWSEntity;
         #endregion
 
 
@@ -32,9 +37,27 @@ namespace superbotcloudV3
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 Activity reply;
 
+                //test
+                //if (activity.Text == "links") 
+                //{
+                //    await connector.Conversations.ReplyToActivityAsync(reply = activity.CreateReply(GetLinks("Windows|Create").First()));
+                //}
+
                 if (Contain("badwords", activity.Text))
                 {
                     reply = activity.CreateReply(Random("badwordsanswers"));
+                }
+                else if (activity.Text == "yesaws")
+                {
+                    AWSEntity = "";
+                    reply = activity.CreateReply("Ok. Vou enviar!");
+                    //send link AWS
+                }
+                else if (activity.Text == "noaws")
+                {
+                    AWSEntity = "";
+                    reply = activity.CreateReply("Ok. NÃO Vou enviar!");
+                    //send link AWS
                 }
                 else if (Contain("greetings", activity.Text))
                 {
@@ -44,16 +67,24 @@ namespace superbotcloudV3
                 {
                     reply = activity.CreateReply(Random("goodbyesanswers"));
                 }
-                //else if (Contain("AWSlist", activity.Text))
-                //{
-                //    reply = activity.CreateReply(Random("AWSconvertion"));
-                //}
+                else if (AWStoAzure(activity.Text) == "OK")
+                {
+                    reply = createReplyAWS(activity);
+                    interactive = true;
+                }
                 else
                 {
                     reply = activity.CreateReply(Random("missunderstood"));
                 }
 
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                if (interactive)
+                {
+                    interactive = !interactive;
+                    await connector.Conversations.SendToConversationAsync(reply);
+                } else
+                {
+                    await connector.Conversations.ReplyToActivityAsync(reply);
+                }
             }
             else
             {
@@ -94,6 +125,17 @@ namespace superbotcloudV3
         }
         #endregion
 
+        #region /APIS
+        private string[] GetLinks(string keywords)
+        {
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = client.GetAsync("http://dxswarmagents.eastus.cloudapp.azure.com/api/links/" + keywords).Result;
+            string[] data = JsonConvert.DeserializeObject<string[]>(response.Content.ReadAsStringAsync().Result);
+            Debug.WriteLine(data);
+            return data;
+        }
+        #endregion
+
         #region Methods Contain and Random
         /// <summary>
         ///     Used to verify each word inside the message sent from user with specific dictionaries 
@@ -131,6 +173,26 @@ namespace superbotcloudV3
                 x.Add(word);
             }
             return x[random.Next(x.Count())];
+        }
+
+        private string AWStoAzure(string msg)
+        {
+            string result = "";
+
+            string path = "~/Docs/AWS2Azure.json";
+            var json = File.ReadAllText(HttpContext.Current.Server.MapPath(path));
+
+            dynamic array = JsonConvert.DeserializeObject(json);
+            foreach (var word in array)
+            {
+                var x = msg.ToLower();
+                if (msg.ToLower().Contains(word.Name.ToLower()))
+                {
+                    AWSEntity = word.First.Value;
+                    result = "OK";
+                }
+            }
+            return result;
         }
         #endregion
 
@@ -176,6 +238,42 @@ namespace superbotcloudV3
             }
 
             replyToConversation.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+            return replyToConversation;
+        }
+
+        private Activity createReplyAWS(Activity message)
+        {
+            Activity replyToConversation = message.CreateReply("Este é um serviço da AWS. " + Random("AWSconvertion") + AWSEntity + ". " + Random("AWSrecomendations"));
+            replyToConversation.Recipient = message.From;
+            replyToConversation.Type = "message";
+            replyToConversation.Attachments = new List<Attachment>();
+
+            List<CardAction> cardButtons = new List<CardAction>();
+
+            CardAction plButtonYES = new CardAction()
+            {
+                Value = "yesaws",
+                Type = "postBack",
+                Title = "SIM"
+            };
+            cardButtons.Add(plButtonYES);
+
+            CardAction plButtonNO = new CardAction()
+            {
+                Value = "noaws",
+                Type = "postBack",
+                Title = "NÃO"
+            };
+            cardButtons.Add(plButtonNO);
+
+            HeroCard plCard = new HeroCard()
+            {
+                Buttons = cardButtons
+            };
+
+            Attachment plAttachment = plCard.ToAttachment();
+            replyToConversation.Attachments.Add(plAttachment);
 
             return replyToConversation;
         }
