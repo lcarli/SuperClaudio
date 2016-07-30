@@ -73,6 +73,60 @@ namespace superbotcloudV3
                 {
                     reply = activity.CreateReply(Random("goodbyesanswers"));
                 }
+                else if (activity.Text == "Bot, qual a sua arquitetura?")
+                {
+                    string link = "https://peulfg.by3302.livefilestore.com/y3pYLFDIG22tRzAYUNS--dM4ZIWBpNIYu8vfeeSQ3Fhzl_OjlE7OsrRzX2_J_MSE7R6iRlzjMKOgV2IYyfE6mLkcHaEIfjZO1jwK4PfAh75m7SccSTqlqswQ_ZgGWmox2NWr29XqXkMZwFV9QwRjKn3wL0tJZTGc4HBtgyRuSeZA1c/infra.PNG?psid=1";
+                    reply  = activity.CreateReply("Esta é a minha arquitetura");
+                    reply.Recipient = activity.From;
+                    reply.Type = "message";
+                    reply.Attachments = new List<Attachment>();
+                    List<CardImage> cardImages = new List<CardImage>();
+                    cardImages.Add(new CardImage(url: link));
+                    List<CardAction> cardButtons = new List<CardAction>();
+                    CardAction plButton = new CardAction()
+                    {
+                        Value = link,
+                        Type = "openUrl",
+                        Title = "Ver imagem"
+                    };
+                    cardButtons.Add(plButton);
+                    HeroCard plCard = new HeroCard()
+                    {
+                        Title = "Desenho da Arquitetura",
+                        Images = cardImages,
+                        Buttons = cardButtons
+                    };
+                    Attachment plAttachment = plCard.ToAttachment();
+                    reply.Attachments.Add(plAttachment);
+                    interactive = true;
+                }
+                else if (activity.Text == "Bot, como você nasceu?")
+                {
+                    string link = "https://peulfg.by3302.livefilestore.com/y3p1D5hjNqlIPq_Wm5Z7soOICsfXeER2iA1yDEpUwCb19QFkOnMhzyVl0ifJmh6ijPJLjRzIeGkzolQR22P_kgGusWpx3FC7mSdjWrK1kAyOJM61uljRot-sBW9I-V8BESUrvZK3ra2mPGWOcrS6HPXJylsJwDCAfCW2AYxri_f9_g/flow.PNG?psid=1";
+                    reply = activity.CreateReply("Esse assunto é o mais interessante! Este aqui é meu fluxo DevOps.");
+                    reply.Recipient = activity.From;
+                    reply.Type = "message";
+                    reply.Attachments = new List<Attachment>();
+                    List<CardImage> cardImages = new List<CardImage>();
+                    cardImages.Add(new CardImage(url: link));
+                    List<CardAction> cardButtons = new List<CardAction>();
+                    CardAction plButton = new CardAction()
+                    {
+                        Value = link,
+                        Type = "openUrl",
+                        Title = "Ver imagem"
+                    };
+                    cardButtons.Add(plButton);
+                    HeroCard plCard = new HeroCard()
+                    {
+                        Title = "DevOps Flow",
+                        Images = cardImages,
+                        Buttons = cardButtons
+                    };
+                    Attachment plAttachment = plCard.ToAttachment();
+                    reply.Attachments.Add(plAttachment);
+                    interactive = true;
+                }
                 else if (AWStoAzure(activity.Text) == "OK")
                 {
                     reply = createReplyAWS(activity);
@@ -84,9 +138,9 @@ namespace superbotcloudV3
                     string entities = "";
                     foreach (string word in words)
                     {
-                        entities = entities + "|";
+                        entities = word + "|";
                     }
-                    await connector.Conversations.ReplyToActivityAsync(reply = activity.CreateReply(GetLinks(entities).First()));
+                    await connector.Conversations.ReplyToActivityAsync(reply = activity.CreateReply(Random("standard") + GetLinks(entities).First()));
                 }
                 //else
                 //{
@@ -328,7 +382,7 @@ namespace superbotcloudV3
         }
         #endregion
 
-        #region Entity to Table Storage
+        #region Entity to Blob Storage
         public class TelemetryEntity : Entity
         {
             public TelemetryEntity() {}
